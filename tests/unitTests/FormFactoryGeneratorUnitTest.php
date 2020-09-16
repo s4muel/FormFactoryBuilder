@@ -77,15 +77,12 @@ class FormFactoryGeneratorUnitTest extends TestCase
 
 		$expectedResult = 'class factory implements \Arron\FormBuilder\IFormFactory
 {
-
 	/**
 	 * @return \Nette\Forms\Form
 	 */
 	public function create($param1, $param3 = \'default value\')
 	{
-
 	}
-
 }
 ';
 		$this->createTestObjectWithParams($className, $config);
@@ -118,7 +115,7 @@ class FormFactoryGeneratorUnitTest extends TestCase
 	{
 		$this->createTestObjectWithParams('factoryClass', array());
 
-		$this->setExpectedException('\LogicException');
+		$this->expectException('\LogicException');
 
 		$this->getTestObject()->generate();
 	}

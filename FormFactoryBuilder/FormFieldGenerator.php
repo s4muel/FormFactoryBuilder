@@ -49,6 +49,8 @@ class FormFieldGenerator extends GeneratorBase
 			'imageButton' => '\Nette\Forms\Controls\ImageButton',
 			'submit' => '\Nette\Forms\Controls\SubmitButton',
 			'button' => '\Nette\Forms\Controls\Button',
+			'upload' => '\Nette\Forms\Controls\UploadControl',
+			'customClass' => '',
 	);
 
 	/**
@@ -125,6 +127,18 @@ class FormFieldGenerator extends GeneratorBase
 	}
 
 	/**
+	 * @return string
+	 */
+	protected function getCustomControlClassName()
+	{
+		$className = $this->getConfig('class');
+		if (is_null($className)) {
+			throw new \InvalidArgumentException("Field {$this->getFullName()} has 'customClass' type but no 'class' attribute defined.");
+		}
+		return $className;
+	}
+
+	/**
 	 * @param Method $builder
 	 * @param string $formPointer
 	 */
@@ -137,6 +151,9 @@ class FormFieldGenerator extends GeneratorBase
 		}
 
 		$inputClassName = self::$registeredWrappers[$type];
+		if ($type === 'customClass'){
+		    $inputClassName = $this->getCustomControlClassName();
+        }
 		$builder->addBody('$? = $?[?] = new ' . $inputClassName . ';', array($this->getVariableName(), $formPointer, $this->getName()));
 		if ($type === 'password') {
 			$builder->addBody("$?->setType('password');", array($this->getVariableName()));
@@ -171,6 +188,15 @@ class FormFieldGenerator extends GeneratorBase
 		}
 		if (!is_null($alt = $this->getConfig('alt'))) {
 			$builder->addBody('$?->getControlPrototype()->alt = ?;', array($this->getVariableName(), $alt));
+		}
+		if (!is_null($description = $this->getConfig('description'))) {
+			$builder->addBody('$?->setOption("description", ?);', array($this->getVariableName(), $description));
+		}
+		if (!is_null($attributes = $this->getConfig('attributes'))) {
+			$builder->addBody('$?->getControlPrototype()->addAttributes(?);', array($this->getVariableName(), $attributes));
+		}
+		if (!is_null($validationScope = $this->getConfig('validationScope'))) {
+			$builder->addBody('$?->setValidationScope(?);', array($this->getVariableName(), (bool)$validationScope));
 		}
 	}
 
